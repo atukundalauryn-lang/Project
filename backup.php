@@ -31,7 +31,22 @@ if ($_SESSION['role'] !== 'admin') {
 $db = getDB();
 
 
+function logActivity($db, $user_id, $action)
+{
+    $stmt = $db->prepare("
+        INSERT INTO staff_activity
+        (
+            user_id,
+            action
+        )
+        VALUES (?,?)
+    ");
 
+    $stmt->execute([
+        $user_id,
+        $action
+    ]);
+}
 
 
 // ==========================================
@@ -43,6 +58,11 @@ if(isset($_POST['backup'])){
 
 
     $filename = "ims_backup_" . date("Y-m-d_H-i-s") . ".sql";
+    logActivity(
+   	 $db,
+   	 $_SESSION['user_id'],
+   	 "Created database backup: ".$filename
+);
 
 
     header('Content-Type: application/sql');
